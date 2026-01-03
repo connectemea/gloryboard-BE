@@ -12,7 +12,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are required!");
   }
 
-  const admin = await authServices.registerAdmin(req.body);
+  const admin = await authServices.registerAdmin({...req.body , user_type : "admin"});
 
   if (!admin) {
     throw new ApiError(500, "Failed to create admin");
