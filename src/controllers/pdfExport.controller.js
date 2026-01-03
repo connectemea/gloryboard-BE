@@ -3,6 +3,8 @@ import { User } from "../models/user.models.js";
 import { EventRegistration } from "../models/eventRegistration.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { generateParticipantTickets, generateProgramParticipantsList, generateGroupProgramParticipantsList } from "../services/pdfExport.service.js";
+import { getZoneConfig } from "../utils/zoneConfig.js";
+import { zone } from "../constants.js";
 
 const sanitizeText = (text) => text.replace(/\t/g, " ");
 
@@ -40,7 +42,7 @@ const getParticipantTickets = asyncHandler(async (req, res, next) => {
         regId: user.userId,
         name: sanitizeText(user.name).toUpperCase(),
         sex: user.gender.toUpperCase(),
-        zone: "C zone",
+        zone: getZoneConfig(zone).name,
         college: sanitizeText(userCollege),
         course: sanitizeText(user.course),
         dateOfBirth: new Date(user.dob).toLocaleDateString("en-GB"),
@@ -108,7 +110,7 @@ const getParticipantTicketById = asyncHandler(async (req, res, next) => {
       regId: user.userId,
       name: sanitizeText(user.name).toUpperCase(),
       sex: user.gender.toUpperCase(),
-      zone: "C zone",
+      zone: getZoneConfig(zone).name,
       college: sanitizeText(userCollege),
       course: sanitizeText(user.course),
       dateOfBirth: new Date(user.dob).toLocaleDateString("en-GB"),
