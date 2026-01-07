@@ -10,13 +10,16 @@ const registerUser = async (req) => {
   try {
     const existingUser = await User.findOne({
       $or: [{ phoneNumber: data.phoneNumber }],
+      $or: [{ capId: data.capId }],
     });
 
     if (existingUser) {
-      throw new ApiError(
-        409,
-        "User with this phone number already exists"
-      );
+      if (existingUser.phoneNumber === data.phoneNumber) {
+        throw new ApiError(409, "User with this phone number already exists");
+      }
+      if (existingUser.capId === data.capId) {
+        throw new ApiError(409, "User with this capId already exists");
+      }
     }
     const user = await User.create({
       ...data,
