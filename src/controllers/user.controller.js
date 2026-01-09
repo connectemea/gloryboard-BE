@@ -5,10 +5,10 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { userService } from "../services/user.service.js";
 
-// Helper function to validate maximum age (25 years as of January 2026)
+// Helper function to validate maximum age (25 years as of July 1, 2025)
 const validateMaxAge = (dob) => {
   const birthDate = new Date(dob);
-  const referenceDate = new Date("2026-01-01"); 
+  const referenceDate = new Date("2025-07-01"); 
   
   if (isNaN(birthDate.getTime())) {
     throw new ApiError(400, "Invalid date of birth format");
@@ -27,7 +27,7 @@ const validateMaxAge = (dob) => {
   }
   
   if (age > 25) {
-    throw new ApiError(400, `User age must be 25 years or less as of January 2026. Current age: ${age} years`);
+    throw new ApiError(400, `User age must be 25 years or less as of July 1, 2025. Current age: ${age} years`);
   }
   
   return true;
