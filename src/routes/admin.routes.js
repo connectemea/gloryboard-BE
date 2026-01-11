@@ -40,6 +40,7 @@ router.route("/result").post(resultController.createResult);
 router.route("/result/update/:id").put(resultController.updateResult);
 router.route("/result/delete/:id").delete(resultController.deleteResult);
 router.route("/result/grouped-by-college").get(resultController.fetchResultsGroupedByCollege);
+router.route("/result/detailedTopScorers").get(resultController.fetchDetailedGenderTopperResults);
 
 // app config
 router.route("/config/create").post(appConfigController.addConfig);

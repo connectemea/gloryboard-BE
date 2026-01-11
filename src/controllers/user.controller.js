@@ -5,6 +5,34 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { userService } from "../services/user.service.js";
 
+// Helper function to validate maximum age (25 years as of July 1, 2025)
+const validateMaxAge = (dob) => {
+  const birthDate = new Date(dob);
+  const referenceDate = new Date("2025-07-01"); 
+  
+  if (isNaN(birthDate.getTime())) {
+    throw new ApiError(400, "Invalid date of birth format");
+  }
+  
+  if (birthDate > new Date()) {
+    throw new ApiError(400, "Date of birth cannot be in the future");
+  }
+  
+  let age = referenceDate.getFullYear() - birthDate.getFullYear();
+  const monthDiff = referenceDate.getMonth() - birthDate.getMonth();
+  const dayDiff = referenceDate.getDate() - birthDate.getDate();
+  
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+  
+  if (age > 25) {
+    throw new ApiError(400, `User age must be 25 years or less as of July 1, 2025. Current age: ${age} years`);
+  }
+  
+  return true;
+};
+
 const fetchUsers = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, search = "", gender } = req.query;
   let users;
@@ -72,6 +100,8 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are required");
   }
 
+  validateMaxAge(dob);
+
   if (!req.file) throw new ApiError(400, "Picture is required");
 
   req.body.collegeId = req.user._id;
@@ -113,6 +143,8 @@ const updateUser = asyncHandler(async (req, res) => {
   ) {
     throw new ApiError(400, "All fields are required");
   }
+
+  validateMaxAge(dob);
 
   const user = await userService.updateUser(req);
 

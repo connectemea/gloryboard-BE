@@ -920,6 +920,191 @@ const fetchResultsGroupedByCollege = async () => {
   return results;
 };
 
+const fetchResultsByCollegeId = async (collegeId) => {
+  const aggregate = [
+    {
+      $lookup: {
+        from: "events",
+        localField: "event",
+        foreignField: "_id",
+        as: "eventDetails",
+      },
+    },
+    { $unwind: "$eventDetails" },
+    { $unwind: "$winningRegistrations" },
+    {
+      $lookup: {
+        from: "eventregistrations",
+        localField: "winningRegistrations.eventRegistration",
+        foreignField: "_id",
+        as: "eventRegistrationDetails",
+      },
+    },
+    { $unwind: "$eventRegistrationDetails" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "eventRegistrationDetails.participants.user",
+        foreignField: "_id",
+        as: "participantDetails",
+      },
+    },
+    {
+      $lookup: {
+        from: "admins",
+        localField: "participantDetails.collegeId",
+        foreignField: "_id",
+        as: "collegeDetails",
+      },
+    },
+    { $unwind: "$collegeDetails" },
+    {
+      $match: {
+        "collegeDetails._id": mongoose.Types.ObjectId(collegeId),
+      },
+    },
+    {
+      $group: {
+        _id: "$collegeDetails._id",
+        college: { $first: "$collegeDetails.name" },
+        totalScore: { $sum: "$eventRegistrationDetails.score" },
+        events: {
+          $push: {
+            event: "$eventDetails.name",
+            position: "$winningRegistrations.position",
+            score: "$eventRegistrationDetails.score",
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        college: 1,
+        totalScore: 1,
+        events: 1,
+      },
+    },
+    {
+      $sort: {
+        totalScore: -1,
+      },
+    },
+  ];
+
+  const results = await Result.aggregate(aggregate);
+  return results;
+};
+
+const fetchDetailedGenderTopperResults = async () => {
+  try {
+    const aggregate = [
+      {
+        $lookup: {
+          from: "events",
+          localField: "event",
+          foreignField: "_id",
+          as: "eventDetails",
+        },
+      },
+      { $unwind: "$eventDetails" },
+      {
+        $lookup: {
+          from: "eventtypes",
+          localField: "eventDetails.event_type",
+          foreignField: "_id",
+          as: "eventTypeDetails",
+        },
+      },
+      { $unwind: "$eventTypeDetails" },
+      {
+        $match: {
+          "eventTypeDetails.is_onstage": true,
+          "eventTypeDetails.is_group": false,
+        },
+      },
+      { $unwind: "$winningRegistrations" },
+      {
+        $lookup: {
+          from: "eventregistrations",
+          localField: "winningRegistrations.eventRegistration",
+          foreignField: "_id",
+          as: "eventRegistrationDetails",
+        },
+      },
+      { $unwind: "$eventRegistrationDetails" },
+      { $unwind: "$eventRegistrationDetails.participants" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "eventRegistrationDetails.participants.user",
+          foreignField: "_id",
+          as: "participantDetails",
+        },
+      },
+      { $unwind: "$participantDetails" },
+      {
+        $match: {
+          "participantDetails.gender": { $in: ["male", "female"] },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            gender: "$participantDetails.gender",
+            user: "$participantDetails._id",
+          },
+          gender: { $first: "$participantDetails.gender" },
+          userName: { $first: "$participantDetails.name" },
+          image: { $first: "$participantDetails.image" },
+          college: { $first: "$participantDetails.college" },
+          totalScore: { $sum: "$eventRegistrationDetails.score" },
+          events: {
+            $push: {
+              name: "$eventDetails.name",
+              position: "$winningRegistrations.position",
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          gender: 1,
+          totalScore: -1,
+        },
+      },
+      {
+        $group: {
+          _id: "$gender",
+          topScorers: {
+            $push: {
+              name: "$userName",
+              score: "$totalScore",
+              image: "$image",
+              college: "$college",
+              events: "$events",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          gender: "$_id",
+          topScorers: { $slice: ["$topScorers", 10] },
+        },
+      },
+    ];
+
+    const results = await Result.aggregate(aggregate);
+
+    return results;
+  } catch (error) {
+    console.error(error.message);
+    throw new Error("Failed to fetch detailed result");
+  }
+};
+
 export const resultServices = {
   fetchAllResults,
   fetchResultByEventId,
@@ -930,4 +1115,6 @@ export const resultServices = {
   updateLeaderboardData,
   fetchLeaderboardData,
   fetchResultsGroupedByCollege,
+  fetchResultsByCollegeId,
+  fetchDetailedGenderTopperResults,
 };

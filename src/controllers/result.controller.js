@@ -134,6 +134,15 @@ const fetchResultsGroupedByCollege = asyncHandler(async (req, res, next) => {
 
 });
 
+const fetchDetailedGenderTopperResults = asyncHandler(async (req, res, next) => {
+  const results = await resultServices.fetchDetailedGenderTopperResults();
+
+  if (!results) {
+    return next(new ApiError(404, "No results found"));
+  }
+
+  res.status(200).json(new ApiResponse(200, results, "Results found"));
+});
 
 export const resultController = {
   createResult,
@@ -144,5 +153,6 @@ export const resultController = {
   deleteResult,
   fetchAllIndividualResults,
   fetchLeaderboard,
-  fetchResultsGroupedByCollege
+  fetchResultsGroupedByCollege,
+  fetchDetailedGenderTopperResults
 };
