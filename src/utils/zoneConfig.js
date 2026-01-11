@@ -1,6 +1,6 @@
 import { rgb } from 'pdf-lib';
 export const getZoneConfig = (zone) => {
-    
+  console.log("zone", zone);
     switch (zone?.toLowerCase()) {
       case 'a':
         return {
@@ -14,7 +14,7 @@ export const getZoneConfig = (zone) => {
       case 'c':
         return {
           name:"C zone",
-          primaryColor: rgb(2, 33, 97), 
+          primaryColor: rgb(0.08, 0.13, 0.38),
           headerImagePath: './src/templates/zone_c_participant_ticket_header.png',
           footerText: ["Kindly submit the C-zone copy along with the following documents to the Program Office on or before 16th January.", "A copy of your SSLC Book.", "A copy of your Hall Ticket."],
           DB_NAME: "C-Zone",
