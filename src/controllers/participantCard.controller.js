@@ -33,8 +33,6 @@ const fetchParticipansData = async (collegeId) => {
                 return null;
             }
 
-            console.log(eventRegistrations)
-
             const userCollege = (await User.findById(user._id).populate("collegeId")).collegeId.name;
 
             return {
@@ -55,6 +53,56 @@ const fetchParticipansData = async (collegeId) => {
     }
 
     return { users: filteredUsers, error: null };
+};
+
+/**
+ * Helper function to fetch and transform participant card data for ALL colleges
+ * @returns {Promise<{users: Array, error: {status: number, message: string} | null}>}
+ */
+const fetchAllParticipantsData = async () => {
+    // Fetch all users
+    const users = await User.find({});
+    if (!users || users.length === 0) {
+        return { users: null, error: { status: 404, message: "No users found" } };
+    }
+
+    // Fetch related data from the EventRegistration collection for each user
+    const transformedUsers = await Promise.all(
+        users.map(async (user) => {
+            const eventRegistrations = await EventRegistration.find({
+                "participants.user": user._id,
+            })
+                .populate({
+                    path: "event",
+                    select: "name"
+                });
+
+            if (eventRegistrations.length === 0) {
+                return null;
+            }
+
+            const userCollege = (await User.findById(user._id).populate("collegeId")).collegeId?.name || "Unknown";
+
+            return {
+                regId: user.userId,
+                name: sanitizeText(user.name).toUpperCase(),
+                college: sanitizeText(userCollege),
+                image: user.image,
+                programs: eventRegistrations.map((reg) => sanitizeText(reg.event.name)),
+            };
+        })
+    );
+
+    // Filter out users who don't have any event registrations
+    const filteredUsers = transformedUsers.filter((user) => user !== null);
+
+    if (filteredUsers.length === 0) {
+        return { users: null, error: { status: 404, message: "No valid registrations found" } };
+    }
+    // Sort users by college name to group participants from the same college together
+    const sortedUsers = filteredUsers.sort((a, b) => a.college.localeCompare(b.college));
+
+    return { users: sortedUsers, error: null };
 };
 
 const getParticipantCards = asyncHandler(async (req, res, next) => {
@@ -130,8 +178,27 @@ const getParticipantCardById = asyncHandler(async (req, res, next) => {
     res.send(Buffer.from(pdfByte));
 });
 
+/**
+ * Admin route: Get all participant cards for all colleges in compact A4 format
+ */
+const getAllParticipantCardsCompact = asyncHandler(async (req, res, next) => {
+    const { users, error } = await fetchAllParticipantsData();
+    if (error) {
+        return next(new ApiError(error.status, error.message));
+    }
+
+    const pdfBytes = await generateParticipantCardsCompact(users);
+
+    res.set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": 'attachment; filename="all-participant-cards-A4.pdf"',
+    });
+    res.send(Buffer.from(pdfBytes));
+});
+
 export const participantCardController = {
     getParticipantCards,
     getParticipantCardsCompact,
     getParticipantCardById,
+    getAllParticipantCardsCompact,
 };

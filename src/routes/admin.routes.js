@@ -8,6 +8,7 @@ import { resultController } from "../controllers/result.controller.js";
 import { adminController } from "../controllers/admin.controller.js";
 import { appConfigController } from "../controllers/appConfig.controller.js";
 import { pdfExportController } from "../controllers/pdfExport.controller.js";
+import { participantCardController } from "../controllers/participantCard.controller.js";
 
 const router = Router();
 
@@ -51,6 +52,7 @@ router.route("/event-registration").get(eventRegistrationController.getAllEventR
 
 // PDF export routes
 router.route("/participants-list/:id").get(pdfExportController.getProgramParticipantsListById);
+router.route("/all-participant-cards").get(participantCardController.getAllParticipantCardsCompact);
 
 router.route("/result-categories").get(eventController.fetchResultCategories);
 
