@@ -106,7 +106,7 @@ const fetchAllParticipantsData = async () => {
 };
 
 const getParticipantCards = asyncHandler(async (req, res, next) => {
-    const collegeId = req.user.id;
+    const collegeId = req.params?.id || req.user?.id;
 
     const { users, error } = await fetchParticipansData(collegeId);
     if (error) {
@@ -117,13 +117,13 @@ const getParticipantCards = asyncHandler(async (req, res, next) => {
 
     res.set({
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="participant-cards.pdf"',
+        "Content-Disposition": `attachment; filename="${users[0]?.college}-participant-cards-A6.pdf"`,
     });
     res.send(Buffer.from(pdfBytes));
 });
 
 const getParticipantCardsCompact = asyncHandler(async (req, res, next) => {
-    const collegeId = req.user.id;
+    const collegeId = req.params?.id || req.user?.id;
 
     const { users, error } = await fetchParticipansData(collegeId);
     if (error) {
@@ -134,7 +134,7 @@ const getParticipantCardsCompact = asyncHandler(async (req, res, next) => {
 
     res.set({
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="participant-cards-A4.pdf"',
+        "Content-Disposition": `attachment; filename="${users[0]?.college}-participant-cards.pdf"`,
     });
     res.send(Buffer.from(pdfBytes));
 });
