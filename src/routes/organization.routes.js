@@ -34,9 +34,9 @@ router.route("/events").get(eventController.fetchAllEvents);
 // PDF export routes
 router.route("/participant-tickets").get(pdfExportController.getParticipantTickets);
 router.route("/ticket/:id").get(pdfExportController.getParticipantTicketById);
-router.route("/participant-cards").get(participantCardController.getParticipantCards);
-router.route("/participant-card/:id").get(participantCardController.getParticipantCardById);
-router.route("/participant-cards-compact").get(participantCardController.getParticipantCardsCompact);
+// router.route("/participant-cards").get(participantCardController.getParticipantCards);
+// router.route("/participant-card/:id").get(participantCardController.getParticipantCardById);
+// router.route("/participant-cards-compact").get(participantCardController.getParticipantCardsCompact);
 
 
 // configs 

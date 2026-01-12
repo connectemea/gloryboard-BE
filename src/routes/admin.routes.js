@@ -53,6 +53,11 @@ router.route("/event-registration").get(eventRegistrationController.getAllEventR
 // PDF export routes
 router.route("/participants-list/:id").get(pdfExportController.getProgramParticipantsListById);
 router.route("/all-participant-cards").get(participantCardController.getAllParticipantCardsCompact);
+router.route("/participant-cards-compact/:id").get(participantCardController.getParticipantCardsCompact)
+router.route("/participant-cards/:id").get(participantCardController.getParticipantCards);
+// get participant card by user Id
+router.route("/participant-card/:id").get(participantCardController.getParticipantCardById);
+
 
 router.route("/result-categories").get(eventController.fetchResultCategories);
 
