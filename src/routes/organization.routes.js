@@ -10,7 +10,7 @@ import { appConfigController } from "../controllers/appConfig.controller.js";
 import { eventController } from "../controllers/event.controller.js";
 const router = Router();
 
-// router.use(verifyJWT, verifyRole(["admin", "organization"]));
+router.use(verifyJWT, verifyRole(["admin", "organization"]));
 
 
 router.route("/register").post(upload.single('image'), userController.registerUser);
@@ -35,6 +35,7 @@ router.route("/events").get(eventController.fetchAllEvents);
 router.route("/participant-tickets").get(pdfExportController.getParticipantTickets);
 router.route("/ticket/:id").get(pdfExportController.getParticipantTicketById);
 router.route("/participant-cards").get(participantCardController.getParticipantCards);
+router.route("/participant-card/:id").get(participantCardController.getParticipantCardById);
 router.route("/participant-cards-compact").get(participantCardController.getParticipantCardsCompact);
 
 
