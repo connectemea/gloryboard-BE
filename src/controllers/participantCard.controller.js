@@ -123,7 +123,7 @@ const getParticipantCards = asyncHandler(async (req, res, next) => {
 });
 
 const getParticipantCardsCompact = asyncHandler(async (req, res, next) => {
-    const collegeId = req.user.id;
+    const collegeId = req.params?.id || req.user?.id;
 
     const { users, error } = await fetchParticipansData(collegeId);
     if (error) {
