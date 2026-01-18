@@ -179,7 +179,7 @@ const getParticipantCardById = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * Admin route: Get all participant cards for all colleges in compact A4 format
+ * Admin route: Get all participant cards for all colleges in compact A3 format
  */
 const getAllParticipantCardsCompact = asyncHandler(async (req, res, next) => {
     const { users, error } = await fetchAllParticipantsData();
@@ -191,7 +191,7 @@ const getAllParticipantCardsCompact = asyncHandler(async (req, res, next) => {
 
     res.set({
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="all-participant-cards-A4.pdf"',
+        "Content-Disposition": 'attachment; filename="all-participant-cards-A3.pdf"',
     });
     res.send(Buffer.from(pdfBytes));
 });
