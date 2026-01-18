@@ -15,6 +15,10 @@ const A6_HEIGHT = 419.5;
 const A4_WIDTH = 595.28;
 const A4_HEIGHT = 841.89;
 
+// A3 dimensions in points (landscape orientation for max cards)
+const A3_LANDSCAPE_WIDTH = 1190.55;
+const A3_LANDSCAPE_HEIGHT = 841.89;
+
 /**
  * Helper function to draw a single participant card on a page at specified offset
  * @param {Object} params - Drawing parameters
@@ -254,7 +258,7 @@ export const generateParticipantCards = async (users) => {
 };
 
 /**
- * Generate participant cards with 4 A6 cards per A4 page (2x2 grid layout)
+ * Generate participant cards with 8 A6 cards per A3 page (4x2 grid layout, landscape)
  * @param {Array} users - Array of user objects
  * @returns {Promise<Uint8Array>} - PDF bytes
  */
@@ -279,25 +283,30 @@ export const generateParticipantCardsCompact = async (users) => {
       users.map((user) => embedUserImage(pdfDoc, user))
     );
 
-    // Card positions on A4 page (2x2 grid)
-    // Position 0: Top-left, Position 1: Top-right
-    // Position 2: Bottom-left, Position 3: Bottom-right
+    // Card positions on A3 landscape page (4x2 grid)
+    // Row 1 (top): positions 0-3, Row 2 (bottom): positions 4-7
     const cardPositions = [
-      { x: 0, y: A6_HEIGHT + 2.89 },           // Top-left
-      { x: A6_WIDTH, y: A6_HEIGHT + 2.89 },    // Top-right
-      { x: 0, y: 0 },                   // Bottom-left
-      { x: A6_WIDTH, y: 0 },            // Bottom-right
+      // Top row (left to right)
+      { x: 0, y: A6_HEIGHT + 2.89 },                       // Position 0: Top-left
+      { x: A6_WIDTH, y: A6_HEIGHT + 2.89 },                // Position 1: Top-center-left
+      { x: A6_WIDTH * 2, y: A6_HEIGHT + 2.89 },            // Position 2: Top-center-right
+      { x: A6_WIDTH * 3, y: A6_HEIGHT + 2.89 },            // Position 3: Top-right
+      // Bottom row (left to right)
+      { x: 0, y: 0 },                                      // Position 4: Bottom-left
+      { x: A6_WIDTH, y: 0 },                               // Position 5: Bottom-center-left
+      { x: A6_WIDTH * 2, y: 0 },                           // Position 6: Bottom-center-right
+      { x: A6_WIDTH * 3, y: 0 },                           // Position 7: Bottom-right
     ];
 
     let currentPage = null;
     let cardIndex = 0;
 
     for (let i = 0; i < users.length; i++) {
-      const positionOnPage = cardIndex % 4;
+      const positionOnPage = cardIndex % 8;
 
-      // Create a new A4 page when starting a new group of 4
+      // Create a new A3 landscape page when starting a new group of 8
       if (positionOnPage === 0) {
-        currentPage = pdfDoc.addPage([A4_WIDTH, A4_HEIGHT]);
+        currentPage = pdfDoc.addPage([A3_LANDSCAPE_WIDTH, A3_LANDSCAPE_HEIGHT]);
       }
 
       const position = cardPositions[positionOnPage];
