@@ -5,7 +5,7 @@ export const getZoneConfig = (zone) => {
     case 'a':
       return {
         name:"A zone",
-        primaryColor: rgb(0.69, 0.18, 0.51),
+        primaryColor: rgb(0.91, 0.57, 0.14),
         headerImagePath: './src/templates/zone_a_participant_ticket_header.png',
         participantCardImagePath: './src/templates/zone_c_participant_card.png',
         participantCardColor: rgb(0.353, 0.231, 0.102),
