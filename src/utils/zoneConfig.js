@@ -40,7 +40,7 @@ export const getZoneConfig = (zone) => {
         name:"F zone",
         primaryColor: rgb(0.54, 0.09, 0.10),
         headerImagePath: './src/templates/zone_f_participant_ticket_header.png',
-        participantCardImagePath: './src/templates/zone_c_participant_card.png',
+        participantCardImagePath: './src/templates/zone_f_participant_card.png',
         participantCardColor: rgb(0.353, 0.231, 0.102),
         footerText: ["Kindly submit the F-zone copy along with the following documents to the Program Office on or before 5th February.", "A copy of your SSLC Book.", "A copy of your Hall Ticket."],
         DB_NAME: "F-Zone",
