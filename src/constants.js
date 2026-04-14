@@ -13,5 +13,7 @@ export const POSITIONS = {
 
 export const DEPARTMENTS = [];
 
+export const USER_ZONE_KEYS = ["a","b","c","d","f"];
+
 export const RESULT_CATEGORIES = ["chithrolsavam" , "saahithyolsavam"];
 
