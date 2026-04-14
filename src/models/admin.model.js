@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { USER_ZONE_KEYS } from "../constants.js";
+
 
 const adminSchema = new mongoose.Schema({
   user_type : { type: String, required: true, enum : ["admin", "organization"]},
@@ -8,6 +10,7 @@ const adminSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true},
   phoneNumber : { type: Number, required: true, unique: true },
+  zone: { type: String, enum: USER_ZONE_KEYS, index: true },
 } , {
     timestamps: true,
 });

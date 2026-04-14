@@ -46,6 +46,17 @@ export const getZoneConfig = (zone) => {
           DB_NAME: "F-Zone",
           idPrefix : "KSK"
         };
+      case 'inter':
+        return {
+          name: "Inter-Zone",
+          primaryColor: rgb(0.08, 0.13, 0.38),
+          headerImagePath: "./src/templates/zone_c_participant_ticket_header.png",
+          participantCardImagePath: "./src/templates/zone_c_participant_card.png",
+          participantCardColor: rgb(0.353, 0.231, 0.102),
+          footerText: ["Kindly submit your Inter-Zone copy along with the following documents to the Program Office.", "A copy of your SSLC Book.", "A copy of your Hall Ticket."],
+          DB_NAME: "Inter-Zone",
+          idPrefix: "INT",
+        };
       default:
         return null;
     }
