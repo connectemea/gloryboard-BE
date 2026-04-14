@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { connectDB } from "./db/index.js";
 import healthcheckRouter  from "./routes/healthcheck.routes.js";
 import publicRouter from './routes/public.routes.js'
 import organizationRouter from './routes/organization.routes.js'
@@ -13,6 +14,9 @@ import logger from "./services/logger.service.js";
 dotenv.config({
   path: "./.env",
 });
+
+// Connect to MongoDB (required for Vercel where src/app.js is the entry point)
+connectDB();
 
 const app = express();
 
