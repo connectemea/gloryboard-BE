@@ -1,5 +1,5 @@
-import app from "../src/app.js";
-import logger from "./services/logger.service.js";
+import app from "./src/app.js";
+import logger from "./src/services/logger.service.js";
 
 
 if (process.env.NODE_ENV !== 'production') {
