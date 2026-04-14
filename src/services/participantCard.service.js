@@ -278,10 +278,16 @@ export const generateParticipantCardsCompact = async (users) => {
     const backgroundFile = fs.readFileSync(participantCardImagePath);
     const backgroundImage = await pdfDoc.embedPng(backgroundFile);
 
-    // Pre-embed all user images
-    const userImages = await Promise.all(
-      users.map((user) => embedUserImage(pdfDoc, user))
-    );
+
+    // Pre-embed all user images in batches to avoid overwhelming the server
+    const BATCH_SIZE = 20;
+    const userImages = [];
+    for (let i = 0; i < users.length; i += BATCH_SIZE) {
+      const batch = users.slice(i, i + BATCH_SIZE);
+      const batchImages = await Promise.all(batch.map((user) => embedUserImage(pdfDoc, user)));
+      userImages.push(...batchImages);
+      console.log("pushed images = ", i)
+    }
 
     // Card positions on A3 landscape page (4x2 grid)
     // Row 1 (top): positions 0-3, Row 2 (bottom): positions 4-7
@@ -328,6 +334,7 @@ export const generateParticipantCardsCompact = async (users) => {
 
     return await pdfDoc.save();
   } catch (error) {
+    console.error("Error in generateParticipantCardsCompact: ", error);
     throw error;
   }
 };

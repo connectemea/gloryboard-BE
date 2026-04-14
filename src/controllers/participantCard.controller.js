@@ -4,7 +4,7 @@ import { EventRegistration } from "../models/eventRegistration.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { generateParticipantCards, generateParticipantCardsCompact } from "../services/participantCard.service.js";
 
-const sanitizeText = (text) => text.replace(/\t/g, " ");
+const sanitizeText = (text) => text.replace(/\t/g, " ").trim();
 
 /**
  * Helper function to fetch and transform participant card data for a college
@@ -60,47 +60,58 @@ const fetchParticipansData = async (collegeId) => {
  * @returns {Promise<{users: Array, error: {status: number, message: string} | null}>}
  */
 const fetchAllParticipantsData = async () => {
-    // Fetch all users
-    const users = await User.find({});
+    // Query 1: Fetch all users with their college populated in a single query
+    const users = await User.find({}).populate("collegeId", "name");
     if (!users || users.length === 0) {
         return { users: null, error: { status: 404, message: "No users found" } };
     }
 
-    // Fetch related data from the EventRegistration collection for each user
-    const transformedUsers = await Promise.all(
-        users.map(async (user) => {
-            const eventRegistrations = await EventRegistration.find({
-                "participants.user": user._id,
-            })
-                .populate({
-                    path: "event",
-                    select: "name"
-                });
+    // Build a userId -> user map for fast lookup
+    const userMap = new Map(users.map((u) => [u._id.toString(), u]));
 
-            if (eventRegistrations.length === 0) {
-                return null;
+    // Query 2: Fetch ALL event registrations that involve any of these users, in one query
+    const allRegistrations = await EventRegistration.find({
+        "participants.user": { $in: users.map((u) => u._id) },
+    }).populate({ path: "event", select: "name" });
+
+    // Group registrations by user ID (a single user can appear in multiple registrations)
+    const registrationsByUser = new Map();
+    for (const reg of allRegistrations) {
+        for (const participant of reg.participants) {
+            const uid = participant.user.toString();
+            if (userMap.has(uid)) {
+                if (!registrationsByUser.has(uid)) {
+                    registrationsByUser.set(uid, []);
+                }
+                registrationsByUser.get(uid).push(reg);
             }
+        }
+    }
 
-            const userCollege = (await User.findById(user._id).populate("collegeId")).collegeId?.name || "Unknown";
+    // Transform in-memory — no further DB calls needed
+    const transformedUsers = users
+        .map((user) => {
+            const regs = registrationsByUser.get(user._id.toString());
+            if (!regs || regs.length === 0) return null;
+
+            const collegeName = user.collegeId?.name || "Unknown";
 
             return {
                 regId: user.userId,
                 name: sanitizeText(user.name).toUpperCase(),
-                college: sanitizeText(userCollege),
+                college: sanitizeText(collegeName),
                 image: user.image,
-                programs: eventRegistrations.map((reg) => sanitizeText(reg.event.name)),
+                programs: regs.map((reg) => sanitizeText(reg.event.name)),
             };
         })
-    );
+        .filter(Boolean);
 
-    // Filter out users who don't have any event registrations
-    const filteredUsers = transformedUsers.filter((user) => user !== null);
-
-    if (filteredUsers.length === 0) {
+    if (transformedUsers.length === 0) {
         return { users: null, error: { status: 404, message: "No valid registrations found" } };
     }
+
     // Sort users by college name to group participants from the same college together
-    const sortedUsers = filteredUsers.sort((a, b) => a.college.localeCompare(b.college));
+    const sortedUsers = transformedUsers.sort((a, b) => a.college.localeCompare(b.college));
 
     return { users: sortedUsers, error: null };
 };
