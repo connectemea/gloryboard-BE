@@ -75,33 +75,63 @@ export const generateParticipantTickets = async (users) => {
 
           // Participant Ticket Header
           const ticketHeadingY = pageHeight - margin - headerImageHeight - 12;
-          page.drawRectangle({
-            x: 133,
-            y: ticketHeadingY,
-            width: 326,
-            height: 25,
-            color: primaryColor,
-          })
-          page.drawText("Zone Festival", {
-            x: 143,
-            y: ticketHeadingY + 7,
-            font: helveticaBold,
-            size: 16,
-            color: rgb(1, 1, 1),
-          })
-          page.drawRectangle({
-            x: 256,
-            y: ticketHeadingY + 3,
-            width: 200,
-            height: 19,
-            color: rgb(1, 1, 1),
-          })
-          page.drawText("PARTICIPANT'S TICKET", {
-            x: 265,
-            y: ticketHeadingY + 7,
-            font: helveticaBold,
-            size: 16,
-          })
+          if (zone.toLowerCase() === "inter") {
+            page.drawRectangle({
+              x: 116,
+              y: ticketHeadingY,
+              width: 360,
+              height: 25,
+              color: primaryColor,
+            })
+            page.drawText("Inter-zone Festival", {
+              x: 125,
+              y: ticketHeadingY + 7,
+              font: helveticaBold,
+              size: 16,
+              color: rgb(1, 1, 1),
+            })
+            page.drawRectangle({
+              x: 273,
+              y: ticketHeadingY + 3,
+              width: 200,
+              height: 19,
+              color: rgb(1, 1, 1),
+            })
+            page.drawText("PARTICIPANT'S TICKET", {
+              x: 282,
+              y: ticketHeadingY + 7,
+              font: helveticaBold,
+              size: 16,
+            })
+          } else {
+            page.drawRectangle({
+              x: 133,
+              y: ticketHeadingY,
+              width: 326,
+              height: 25,
+              color: primaryColor,
+            })
+            page.drawText("Zone Festival", {
+              x: 143,
+              y: ticketHeadingY + 7,
+              font: helveticaBold,
+              size: 16,
+              color: rgb(1, 1, 1),
+            })
+            page.drawRectangle({
+              x: 256,
+              y: ticketHeadingY + 3,
+              width: 200,
+              height: 19,
+              color: rgb(1, 1, 1),
+            })
+            page.drawText("PARTICIPANT'S TICKET", {
+              x: 265,
+              y: ticketHeadingY + 7,
+              font: helveticaBold,
+              size: 16,
+            })
+          }
 
           // Header text
           page.drawText(`( ${copy} )`, {

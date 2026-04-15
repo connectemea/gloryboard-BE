@@ -49,8 +49,8 @@ export const getZoneConfig = (zone) => {
       case 'inter':
         return {
           name: "Inter-Zone",
-          primaryColor: rgb(0.08, 0.13, 0.38),
-          headerImagePath: "./src/templates/zone_c_participant_ticket_header.png",
+          primaryColor: rgb(0.228, 0.459, 0.102),
+          headerImagePath: "./src/templates/interzone_participant_ticket_header.png",
           participantCardImagePath: "./src/templates/interzone_participant_card.png",
           participantCardColor: rgb(0.228, 0.459, 0.102),
           footerText: ["Kindly submit your Inter-Zone copy along with the following documents to the Program Office.", "A copy of your SSLC Book.", "A copy of your Hall Ticket."],
